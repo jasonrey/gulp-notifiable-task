@@ -1,0 +1,39 @@
+{
+  "name": "gulp-notifiable-task",
+  "version": "1.0.0",
+  "description": "A wrapper to create gulp task with node-notify.",
+  "keywords": [
+    "gulp plugin",
+    "gulp task",
+    "gulp wrapper",
+    "wrapper",
+    "node-notify",
+    "notify",
+    "gulp",
+    "notification",
+    "reporter",
+    "windows notification",
+    "mac notification",
+    "notify-send",
+    "notify-osd",
+    "growl"
+  ],
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasonrey/gulp-notifiable-task.git"
+  },
+  "author": "JSON object",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jasonrey/gulp-notifiable-task/issues"
+  },
+  "homepage": "https://github.com/jasonrey/gulp-notifiable-task#readme",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-util": "^3.0.8",
+    "node-notifier": "^5.1.2"
+  }
+}
