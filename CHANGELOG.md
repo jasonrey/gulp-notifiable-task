@@ -1,3 +1,7 @@
+## v1.0.2 - 21-06-2017
+
+- Update credits
+
 ## v1.0.1 - 21-06-2017
 
 - Fix missing plumber
