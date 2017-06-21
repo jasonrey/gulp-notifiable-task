@@ -1,6 +1,6 @@
 {
   "name": "gulp-notifiable-task",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A wrapper to create gulp task with node-notify.",
   "keywords": [
     "gulp plugin",
