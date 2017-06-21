@@ -1,4 +1,5 @@
 let gulp = require('gulp'),
+    plumber = require('gulp-plumber'),
     util = require('gulp-util'),
     notifier = require('node-notifier');
 
