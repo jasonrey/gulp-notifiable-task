@@ -35,3 +35,11 @@ Underlyingly, the plugin is using:
 
 - Customizable notification templates
 - Custom callback before notification
+
+## Credits
+
+- calvin @ weixhen.co
+- [`node-notifier`](https://www.npmjs.com/package/node-notifier)
+- [`gulp`](https://www.npmjs.com/package/gulp)
+- [`gulp-plumber`](https://www.npmjs.com/package/gulp-plumber)
+- [`gulp-util`](https://www.npmjs.com/package/gulp-util)
