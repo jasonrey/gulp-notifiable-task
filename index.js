@@ -1,18 +1,17 @@
+'use strict';
+
 let gulp = require('gulp'),
     plumber = require('gulp-plumber'),
     util = require('gulp-util'),
     notifier = require('node-notifier');
 
 let disableNotification = false;
+let noNotification = util.env.production || util.env.staging || util.env.disableNotification || process.env.DISABLE_NOTIFIER;
 let hasError = false;
 
 let notify = {
     show(title, message) {
-        if (util.env.production ||
-            util.env.staging ||
-            util.env.disableNotification ||
-            process.env.DISABLE_NOTIFIER ||
-            disableNotification) {
+        if (noNotification || disableNotification) {
             return;
         }
 
@@ -30,57 +29,94 @@ let notify = {
     }
 };
 
-let notifiableTask = (taskname, subtasks, handler) => {
-    if (typeof subtasks === 'object' && subtasks.constructor.name === 'Array') {
-        subtasks.unshift('disableNotification');
+let generateCallback = (taskname, subtasks, handler) => {
+    if (typeof handler !== 'function') {
+        handler = function() {};
+    }
 
-        gulp.task(taskname, subtasks, () => {
-            disableNotification = false;
+    let hasDone = !!handler.length;
 
-            notify[hasError ? 'error' : 'success'](taskname);
-
-            if (typeof handler === 'function') {
-                handler();
+    return function() {
+        return new Promise((resolve, reject) => {
+            if (subtasks.length) {
+                disableNotification = false;
             }
-        });
-    } else {
+
+            hasError = false;
+
+            let originalSrc = gulp.src;
+
+            let hasStream = false;
+
+            gulp.src = paths => {
+                hasStream = true;
+
+                return originalSrc(paths)
+                    .on('end', () => {
+                        setTimeout(() => {
+                            if (!hasError) {
+                                resolve();
+                            }
+                        }, 500);
+                    })
+                    .pipe(plumber({
+                        errorHandler(error) {
+                            reject(error);
+                        }
+                    }));
+            };
+
+            let result = hasDone ? new Promise(handler) : handler();
+
+            gulp.src = originalSrc;
+
+            if (!hasStream) {
+                Promise.resolve(result)
+                    .then(resolve)
+                    .catch(reject);
+            }
+        })
+            .then(() => {
+                notify.success(taskname);
+            })
+            .catch(error => {
+                hasError = true;
+
+                disableNotification = false;
+
+                notify.error(taskname);
+
+                console.error(error.message);
+            });
+    };
+};
+
+let generateFallbackHandler = function(taskname) {
+    return function() {
+        disableNotification = false;
+
+        notify.success(taskname);
+    };
+};
+
+let notifiableTask = (taskname, subtasks, handler) => {
+    let hasSubtasks = typeof subtasks === 'object' && subtasks.constructor.name === 'Array';
+
+    if (typeof subtasks === 'function') {
         handler = subtasks;
 
-        gulp.task(taskname, () => {
-            return new Promise((resolve, reject) => {
-                hasError = false;
-
-                let stream = (paths) => {
-                    return gulp.src(paths)
-                        .on('end', () => {
-                            setTimeout(() => {
-                                if (!hasError) {
-                                    notify.success(taskname);
-                                }
-
-                                resolve();
-                            }, 500);
-                        })
-                        .pipe(plumber({
-                            errorHandler(error) {
-                                hasError = true;
-
-                                notify.error(taskname);
-
-                                console.error(error.message);
-
-                                reject();
-                            }
-                        }));
-                };
-
-                stream.src = stream;
-                stream.dest = gulp.dest;
-
-                handler(stream);
-            });
-        });
+        subtasks = [];
     }
+
+    if (typeof handler !== 'function') {
+        handler = generateFallbackHandler(taskname);
+    }
+
+    gulp.task(
+        taskname,
+        hasSubtasks && !noNotification ? ['disableNotification', ...subtasks] : subtasks,
+        generateCallback(taskname, subtasks, handler)
+    );
 };
 
 gulp.task('disableNotification', () => {

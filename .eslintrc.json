@@ -11,7 +11,7 @@
         "semi": ["error", "always"],
         "comma-dangle": ["error"],
         "comma-spacing": ["error"],
-        "strict": ["error", "function"],
+        "strict": ["error", "global"],
         "key-spacing": ["error"],
         "no-multiple-empty-lines": ["error"],
         "no-whitespace-before-property": ["error"],
@@ -24,6 +24,7 @@
         "func-call-spacing": ["error"],
         "space-in-parens": ["error"],
         "keyword-spacing": ["error"],
-        "computed-property-spacing": ["error"]
+        "computed-property-spacing": ["error"],
+        "no-console": ["off"]
     }
 }
